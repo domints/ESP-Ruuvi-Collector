@@ -11,13 +11,13 @@ InfluxArduino influx;
 SimpleBLE ble;
 
 
-const char WIFI_NAME[] = "SzymenowaSiec";
-const char WIFI_PASS[] = "pomidor1";
+const char WIFI_NAME[] = "";
+const char WIFI_PASS[] = "";
 
-const char INFLUX_DATABASE[] = "ruuvi";
-const char INFLUX_IP[] = "vps.dszymanski.pl";
-const char INFLUX_USER[] = "dominik";
-const char INFLUX_PASS[] = "r1Xx7qtpPUdT";
+const char INFLUX_DATABASE[] = "";
+const char INFLUX_IP[] = "";
+const char INFLUX_USER[] = "";
+const char INFLUX_PASS[] = "";
 const char INFLUX_MEASUREMENT[] = "ruuviTag";
 
 char formatString[] = "temperature=%0.3f,pressure=%i,humidity=%0.3f,accel_x=%i,accel_y=%i,accel_z=%i,milivolts=%i";
@@ -94,7 +94,7 @@ void setup() {
   influx.authorize(INFLUX_USER, INFLUX_PASS);
   Serial.println("influx ready.");
   
-  BLEDevice::init("ESP-Ruuvi-Collector");
+  BLEDevice::init("");
   pBLEScan = BLEDevice::getScan();
   pBLEScan->setAdvertisedDeviceCallbacks(new AdvertisedDeviceCallbacks());
   pBLEScan->setActiveScan(true);
