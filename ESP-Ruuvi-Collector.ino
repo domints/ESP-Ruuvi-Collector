@@ -1,5 +1,3 @@
-#include <SimpleBLE.h>
-
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEScan.h>
@@ -8,8 +6,6 @@
 #include "InfluxArduino.hpp"
 
 InfluxArduino influx;
-SimpleBLE ble;
-
 
 const char WIFI_NAME[] = "";
 const char WIFI_PASS[] = "";
@@ -34,6 +30,7 @@ unsigned short getUShort(byte* data, int index)
 
 void DecodeV5(byte* data)
 {
+  digitalWrite(5, LOW);
   short tempRaw = getShort(data, 3);
   double temperature = (double)tempRaw * 0.005;
   unsigned short humRaw = getUShort(data, 5);
@@ -50,25 +47,20 @@ void DecodeV5(byte* data)
   
   char fields[128];
   sprintf(fields, formatString, temperature, pressure, humidity, accelX, accelY, accelZ, voltage);
-  Serial.println("writing influx...");
   bool writeSuccessful = influx.write(INFLUX_MEASUREMENT, "device=esp", fields);
   if (!writeSuccessful)
   {
     Serial.print("error: ");
     Serial.println(influx.getResponse());
   }
-  Serial.println("write done.");
+  digitalWrite(5, HIGH);
 }
 
 class AdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
       byte* mData = (byte*)advertisedDevice.getManufacturerData().data();
-      Serial.print("Found something... ");
-      Serial.print(mData[0], HEX);
-      Serial.println(mData[1], HEX);
       if(mData[0] = 0x99 && mData[1] == 0x04)
       {
-        Serial.println("found tag.");
         if(mData[2] == 0x05)
           DecodeV5(mData);
       }
@@ -78,21 +70,21 @@ class AdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
 BLEScan* pBLEScan;
 
 void setup() {
+  pinMode(5, OUTPUT);
+  digitalWrite(5, HIGH);
   Serial.begin(115200);
 
   WiFi.begin(WIFI_NAME, WIFI_PASS);
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
+    digitalWrite(5, LOW);
     Serial.print(".");
+    digitalWrite(5, HIGH);
   }
   Serial.println("WiFi connected!");
-  ble.begin("ESP32 SimpleBLE");
-  Serial.println("Connecting to influx");
   influx.configure(INFLUX_DATABASE, INFLUX_IP);
-  Serial.println("Authorizing influx...");
   influx.authorize(INFLUX_USER, INFLUX_PASS);
-  Serial.println("influx ready.");
   
   BLEDevice::init("");
   pBLEScan = BLEDevice::getScan();
@@ -101,6 +93,5 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("BLE Scanning...");
   BLEScanResults foundDevices = pBLEScan->start(1);
 }
