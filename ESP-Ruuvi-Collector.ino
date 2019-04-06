@@ -113,7 +113,7 @@ class AdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
       byte* mData = (byte*)advertisedDevice.getManufacturerData().data();
       yield();  // reset esp watchdog
-      if (mData[0] == 0x99 && mData[1] == 0x04 && mData[2] == 0x03)
+      if (mData[0] == 0x99 && mData[1] == 0x04)
     {
       if (mData[2] == 0x03)
       {
