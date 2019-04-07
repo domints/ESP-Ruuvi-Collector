@@ -55,7 +55,7 @@ void DecodeV3(byte* data)
 {
   yield();  // reset esp watchdog
   digitalWrite(22, HIGH);
-  short tempRaw = getUShortone(data, 4) & 0b01111111 - 2;
+  short tempRaw = getUShortone(data, 4) & 0b01111111;
   short tempRawsign = getUShortone(data, 4) & 0b10000000;
   short tempRawdec = getUShortone(data, 5);
   double temperature = (double)tempRaw + (double)tempRawdec / 100;
